@@ -61,9 +61,7 @@ struct MenuBarExtraAccess<Content: Scene>: Scene {
                 // do nothing here - the method runs setup when polled by SwiftUI
             }
             .onChange(of: isMenuPresented) { newValue in
-               if isMenuPresented != newValue {
-                  setPresented(newValue)
-               }
+                setPresented(newValue)
             }
             // .onChange(of: isToggling) { newValue in
             //    guard newValue == true else { return }
