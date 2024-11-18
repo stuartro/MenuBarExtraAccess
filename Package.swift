@@ -6,17 +6,16 @@ let package = Package(
     name: "MenuBarExtraAccess",
     platforms: [.macOS(.v10_15)],
     products: [
-        .library(
-            name: "MenuBarExtraAccess",
-            targets: ["MenuBarExtraAccess"]),
+        .library(name: "MenuBarExtraAccess", targets: ["MenuBarExtraAccess"])
     ],
-    dependencies: [],
     targets: [
         .target(
             name: "MenuBarExtraAccess",
-            dependencies: []),
-        .testTarget(
-            name: "MenuBarExtraAccessTests",
-            dependencies: ["MenuBarExtraAccess"]),
+            swiftSettings: [
+                // un-comment to enable debug logging
+                // .define("MENUBAREXTRAACCESS_DEBUG_LOGGING=1")
+            ]
+        ),
+        .testTarget(name: "MenuBarExtraAccessTests", dependencies: ["MenuBarExtraAccess"]),
     ]
 )

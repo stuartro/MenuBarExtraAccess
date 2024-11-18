@@ -13,6 +13,10 @@ extension NSStatusItem {
     /// Toggles the menu/window state by mimicking a menu item button press.
     @_disfavoredOverload
     public func togglePresented() {
+        #if MENUBAREXTRAACCESS_DEBUG_LOGGING
+        print("NSStatusItem.\(#function) called")
+        #endif
+        
         // this also works but only for window-based MenuBarExtra
         // (button.target and button.action are nil when menu-based):
         //   - mimic user pressing the menu item button
@@ -27,6 +31,10 @@ extension NSStatusItem {
     /// Toggles the menu/window state by mimicking a menu item button press.
     @_disfavoredOverload
     internal func setPresented(state: Bool) {
+        #if MENUBAREXTRAACCESS_DEBUG_LOGGING
+        print("NSStatusItem.\(#function) called with state: \(state)")
+        #endif
+        
         // read current state and selectively call toggle if state differs
         let currentState = button?.state != .off
         guard state != currentState else {
@@ -36,9 +44,29 @@ extension NSStatusItem {
         togglePresented()
     }
     
+    @_disfavoredOverload
     internal func updateHighlight() {
+        #if MENUBAREXTRAACCESS_DEBUG_LOGGING
+        print("NSStatusItem.\(#function) called")
+        #endif
+        
         let s = button?.state != .off
+        
+        #if MENUBAREXTRAACCESS_DEBUG_LOGGING
+        print("NSStatusItem.\(#function): State detected as \(s)")
+        #endif
+        
         button?.isHighlighted = s
+    }
+    
+    /// Only call this when the state of the drop-down window is known.
+    internal func setKnownPresented(state: Bool) {
+        switch state {
+        case true:
+            button?.state = .on
+        case false:
+            button?.state = .off
+        }
     }
 }
 
@@ -51,8 +79,7 @@ extension NSStatusItem {
         
         init(
             object: NSStatusBarButton,
-            _ handler: @escaping (_ change: NSKeyValueObservedChange<NSControl.StateValue>)
-                -> Void
+            _ handler: @escaping (_ change: NSKeyValueObservedChange<NSControl.StateValue>) -> Void
         ) {
             objectToObserve = object
             super.init()
@@ -66,7 +93,6 @@ extension NSStatusItem {
         }
         
         deinit {
-            //print("Observer deinit")
             observation?.invalidate()
         }
     }
@@ -75,8 +101,8 @@ extension NSStatusItem {
         _ handler: @escaping (_ change: NSKeyValueObservedChange<NSControl.StateValue>) -> Void
     ) -> ButtonStateObserver? {
         guard let button else { return nil }
-        let newObserver = ButtonStateObserver(object: button, handler)
-        return newObserver
+        let newStatusItemButtonStateObserver = ButtonStateObserver(object: button, handler)
+        return newStatusItemButtonStateObserver
     }
 }
 
